@@ -1,0 +1,53 @@
+# ──────────────────────────────────────────────
+# GitHub Actions Workflow: Weekly Skill Snapshot
+# ──────────────────────────────────────────────
+# Runs every Monday at 06:00 IST (= 00:30 UTC Monday).
+# Can also be triggered manually from the Actions tab.
+#
+# GitHub will automatically email the repo owner if this
+# workflow fails — no extra notification setup needed.
+# ──────────────────────────────────────────────
+
+name: Weekly Skill Snapshot
+
+on:
+  # Monday 00:30 UTC = Monday 06:00 IST exactly
+  schedule:
+    - cron: '30 0 * * 1'
+
+  # Allows manual trigger from GitHub → Actions → Run workflow
+  workflow_dispatch:
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Print run timestamp
+      - name: Print run timestamp
+        run: echo "Run started at $(date)"
+
+      # Step 2: Check out the repository
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 3: Set up Python 3.11
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Step 4: Install Python dependencies
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      # Step 5: Run the snapshot script
+      # Secrets are injected from GitHub Repository Secrets.
+      # Add them at: Repo → Settings → Secrets and variables → Actions
+      - name: Run snapshot
+        run: python scripts/snapshot.py
+        env:
+          ADZUNA_APP_ID:             ${{ secrets.ADZUNA_APP_ID }}
+          ADZUNA_APP_KEY:            ${{ secrets.ADZUNA_APP_KEY }}
+          SUPABASE_URL:              ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}

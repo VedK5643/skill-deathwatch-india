@@ -1,0 +1,343 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: 0px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+:root {
+  /* Skill Deathwatch India Warm Stone Light Theme */
+  /* Design Philosophy: Warm, readable, credible. Like a well-designed print newspaper crossed with modern SaaS. */
+  
+  --background: #FAFAF8;
+  --foreground: #1C1917;
+  --card: #FFFFFE;
+  --card-foreground: #1C1917;
+  --popover: #FFFFFE;
+  --popover-foreground: #1C1917;
+  --primary: #D97706;
+  --primary-foreground: #FFFFFE;
+  --secondary: #F5F3EE;
+  --secondary-foreground: #78716C;
+  --muted: #A8A29E;
+  --muted-foreground: #A8A29E;
+  --accent: #D97706;
+  --accent-foreground: #FFFFFE;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFE;
+  --border: #E8E4DC;
+  --input: #F5F3EE;
+  --ring: #D97706;
+  
+  /* Chart colors */
+  --chart-1: #16A34A;
+  --chart-2: #DC2626;
+  --chart-3: #2563EB;
+  --chart-4: #D97706;
+  --chart-5: #7C3AED;
+  
+  /* Sidebar colors */
+  --sidebar: #FFFFFE;
+  --sidebar-foreground: #1C1917;
+  --sidebar-primary: #D97706;
+  --sidebar-primary-foreground: #FFFFFE;
+  --sidebar-accent: #F5F3EE;
+  --sidebar-accent-foreground: #1C1917;
+  --sidebar-border: #E8E4DC;
+  --sidebar-ring: #D97706;
+  
+  --radius: 0px;
+  
+  /* Warm Stone CSS Variables */
+  --color-bg-page: #FAFAF8;
+  --color-bg-surface: #FFFFFE;
+  --color-bg-hover: #F5F3EE;
+  --color-bg-subtle: #F0EDE6;
+  --color-border-default: #E8E4DC;
+  --color-border-light: #F0EDE6;
+  --color-text-primary: #1C1917;
+  --color-text-secondary: #78716C;
+  --color-text-muted: #A8A29E;
+  --color-accent-amber: #D97706;
+  --color-accent-light: #FEF3C7;
+  --color-up: #16A34A;
+  --color-up-light: #DCFCE7;
+  --color-down: #DC2626;
+  --color-down-light: #FEE2E2;
+  --color-neutral-trend: #A8A29E;
+  
+  /* Category badge colors */
+  --color-category-programming-bg: #FEF3C7;
+  --color-category-programming-text: #92400E;
+  --color-category-frontend-bg: #EDE9FE;
+  --color-category-frontend-text: #4C1D95;
+  --color-category-backend-bg: #DBEAFE;
+  --color-category-backend-text: #1E3A8A;
+  --color-category-data-bg: #D1FAE5;
+  --color-category-data-text: #064E3B;
+  --color-category-devops-bg: #FFE4E6;
+  --color-category-devops-text: #9F1239;
+  --color-category-testing-bg: #F0FDF4;
+  --color-category-testing-text: #14532D;
+  --color-category-ai-bg: #FEE2E2;
+  --color-category-ai-text: #7F1D1D;
+}
+
+.dark {
+  /* Light theme is the default, no dark mode needed for now */
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  /* JetBrains Mono for all numbers */
+  .font-mono, code, pre {
+    font-family: 'JetBrains Mono', monospace;
+  }
+  
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [type="button"]:not(:disabled),
+  [type="submit"]:not(:disabled),
+  [type="reset"]:not(:disabled),
+  a[href],
+  select:not(:disabled),
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    @apply cursor-pointer;
+  }
+}
+
+@layer components {
+  /* Typography System */
+  .text-job-count-hero {
+    @apply text-[24px] font-bold font-mono text-foreground;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+  }
+  
+  .text-job-count-detail {
+    @apply text-[48px] font-bold font-mono text-foreground;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .text-skill-name {
+    @apply text-[13px] font-semibold text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .text-category-label {
+    @apply text-[9px] uppercase font-semibold;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.07em;
+  }
+  
+  .text-percent-change {
+    @apply text-[11px] font-semibold font-mono;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  .text-section-label {
+    @apply text-[11px] uppercase text-muted;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.1em;
+  }
+  
+  .text-nav {
+    @apply text-[12px] font-medium text-secondary;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .text-nav-active {
+    @apply text-[12px] font-semibold text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .text-stat-label {
+    @apply text-[11px] uppercase text-muted;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.08em;
+  }
+  
+  .text-stat-value {
+    @apply text-[20px] font-semibold font-mono;
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Color utilities for trends */
+  .text-trend-up {
+    @apply text-[#16A34A];
+  }
+  
+  .text-trend-down {
+    @apply text-[#DC2626];
+  }
+  
+  .text-trend-neutral {
+    @apply text-[#A8A29E];
+  }
+  
+  .text-interactive {
+    @apply text-[#D97706];
+  }
+  
+  /* Container utility */
+  .container {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .flex {
+    min-height: 0;
+    min-width: 0;
+  }
+
+  @media (min-width: 640px) {
+    .container {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container {
+      padding-left: 2rem;
+      padding-right: 2rem;
+      max-width: 1280px;
+    }
+  }
+  
+  /* Grid border trick: gaps ARE the borders */
+  .skill-grid {
+    @apply grid gap-px;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    background-color: var(--color-border-default);
+  }
+  
+  .skill-card {
+    @apply bg-card p-4 cursor-pointer transition-colors duration-200;
+    background-color: var(--color-bg-surface);
+  }
+  
+  .skill-card:hover {
+    background-color: var(--color-bg-hover);
+  }
+  
+  /* Sparkline styling */
+  .sparkline {
+    @apply w-full;
+    height: 28px;
+  }
+  
+  /* Chart styling */
+  .chart-container {
+    @apply w-full;
+    background-color: var(--color-bg-surface);
+  }
+  
+  /* Pill styling for category filters */
+  .category-pill {
+    @apply px-3 py-1 text-[11px] font-medium border transition-colors duration-200;
+    font-family: 'Inter', sans-serif;
+    border-color: #E0DCD2;
+    color: var(--color-text-secondary);
+    background-color: transparent;
+    border-radius: 20px;
+  }
+  
+  .category-pill:hover {
+    background-color: var(--color-bg-hover);
+  }
+  
+  .category-pill.active {
+    @apply bg-foreground text-background;
+    background-color: var(--color-text-primary);
+    color: var(--color-bg-surface);
+    border-color: var(--color-text-primary);
+  }
+  
+  /* Stat strip dividers */
+  .stat-divider {
+    @apply w-px h-12;
+    background-color: var(--color-border-default);
+  }
+}
+
+/* Recharts custom styling */
+.recharts-surface {
+  background-color: var(--color-bg-surface) !important;
+}
+
+.recharts-cartesian-axis-tick {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  fill: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: var(--color-bg-subtle);
+  stroke-dasharray: 4 2;
+  stroke-width: 0.5;
+}
+
+.recharts-legend-wrapper {
+  padding-top: 16px !important;
+}
+
+.recharts-legend-item {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}

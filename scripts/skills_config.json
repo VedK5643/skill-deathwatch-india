@@ -1,0 +1,49 @@
+[
+  { "name": "Python",       "category": "Programming Languages", "slug": "python"       },
+  { "name": "Java",         "category": "Programming Languages", "slug": "java"         },
+  { "name": "JavaScript",   "category": "Programming Languages", "slug": "javascript"   },
+  { "name": "C++",          "category": "Programming Languages", "slug": "cpp"          },
+  { "name": "Go",           "category": "Programming Languages", "slug": "go"           },
+  { "name": "Rust",         "category": "Programming Languages", "slug": "rust"         },
+  { "name": "Kotlin",       "category": "Programming Languages", "slug": "kotlin"       },
+  { "name": "TypeScript",   "category": "Programming Languages", "slug": "typescript"   },
+
+  { "name": "React",        "category": "Frontend",             "slug": "react"        },
+  { "name": "Angular",      "category": "Frontend",             "slug": "angular"      },
+  { "name": "Vue.js",       "category": "Frontend",             "slug": "vuejs"        },
+  { "name": "Next.js",      "category": "Frontend",             "slug": "nextjs"       },
+  { "name": "HTML/CSS",     "category": "Frontend",             "slug": "html-css"     },
+
+  { "name": "Node.js",      "category": "Backend",              "slug": "nodejs"       },
+  { "name": "Django",       "category": "Backend",              "slug": "django"       },
+  { "name": "Spring Boot",  "category": "Backend",              "slug": "spring-boot"  },
+  { "name": "FastAPI",      "category": "Backend",              "slug": "fastapi"      },
+  { "name": "Flask",        "category": "Backend",              "slug": "flask"        },
+
+  { "name": "SQL",          "category": "Data & Analytics",     "slug": "sql"          },
+  { "name": "Power BI",     "category": "Data & Analytics",     "slug": "power-bi"     },
+  { "name": "Tableau",      "category": "Data & Analytics",     "slug": "tableau"      },
+  { "name": "Excel",        "category": "Data & Analytics",     "slug": "excel"        },
+  { "name": "Pandas",       "category": "Data & Analytics",     "slug": "pandas"       },
+  { "name": "Spark",        "category": "Data & Analytics",     "slug": "spark"        },
+
+  { "name": "AWS",          "category": "DevOps & Cloud",       "slug": "aws"          },
+  { "name": "Azure",        "category": "DevOps & Cloud",       "slug": "azure"        },
+  { "name": "GCP",          "category": "DevOps & Cloud",       "slug": "gcp"          },
+  { "name": "Docker",       "category": "DevOps & Cloud",       "slug": "docker"       },
+  { "name": "Kubernetes",   "category": "DevOps & Cloud",       "slug": "kubernetes"   },
+  { "name": "Terraform",    "category": "DevOps & Cloud",       "slug": "terraform"    },
+  { "name": "Jenkins",      "category": "DevOps & Cloud",       "slug": "jenkins"      },
+
+  { "name": "Selenium",     "category": "Testing",              "slug": "selenium"     },
+  { "name": "Playwright",   "category": "Testing",              "slug": "playwright"   },
+  { "name": "Cypress",      "category": "Testing",              "slug": "cypress"      },
+  { "name": "JUnit",        "category": "Testing",              "slug": "junit"        },
+  { "name": "Postman",      "category": "Testing",              "slug": "postman"      },
+
+  { "name": "TensorFlow",   "category": "AI/ML",                "slug": "tensorflow"   },
+  { "name": "PyTorch",      "category": "AI/ML",                "slug": "pytorch"      },
+  { "name": "Scikit-learn", "category": "AI/ML",                "slug": "scikit-learn" },
+  { "name": "LangChain",    "category": "AI/ML",                "slug": "langchain"    },
+  { "name": "Hugging Face", "category": "AI/ML",                "slug": "hugging-face" }
+]
