@@ -124,7 +124,7 @@ cd skill-deathwatch-india
 
 # Install frontend dependencies
 cd client
-npm install
+pnpm install
 
 # Copy env file and fill in your keys
 cp .env.local.example .env.local
@@ -146,7 +146,7 @@ python snapshot.py
 
 # Start frontend
 cd ../client
-npm run dev
+pnpm run dev
 ```
 
 ---
