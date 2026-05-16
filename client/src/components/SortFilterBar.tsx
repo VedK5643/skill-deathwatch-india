@@ -6,6 +6,8 @@ interface SortFilterBarProps {
   onCategoryChange: (category: string | null) => void;
   sortBy: "name" | "jobs" | "change";
   onSortChange: (sort: "name" | "jobs" | "change") => void;
+  searchQuery: string;
+  onSearchChange: (query: string) => void;
 }
 
 export default function SortFilterBar({
@@ -14,6 +16,8 @@ export default function SortFilterBar({
   onCategoryChange,
   sortBy,
   onSortChange,
+  searchQuery,
+  onSearchChange,
 }: SortFilterBarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -96,10 +100,28 @@ export default function SortFilterBar({
         ))}
       </div>
 
-      {/* Sort Control */}
-      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginLeft: "16px" }}>
-        <span style={{ fontSize: "12px", color: "#A8A29E", whiteSpace: "nowrap" }}>Sort by</span>
-        <div style={{ position: "relative" }}>
+      {/* Search and Sort Control */}
+      <div style={{ display: "flex", alignItems: "center", gap: "16px", marginLeft: "16px" }}>
+        <input
+          type="text"
+          placeholder="Search skills..."
+          value={searchQuery}
+          onChange={(e) => onSearchChange(e.target.value)}
+          style={{
+            padding: "4px 12px",
+            fontSize: "12px",
+            color: "#1C1917",
+            border: "1px solid #E8E4DC",
+            backgroundColor: "#FFFFFE",
+            borderRadius: "4px",
+            outline: "none",
+            width: "140px",
+            fontFamily: "'Inter', sans-serif",
+          }}
+        />
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <span style={{ fontSize: "12px", color: "#A8A29E", whiteSpace: "nowrap" }}>Sort by</span>
+          <div style={{ position: "relative" }}>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             style={{
@@ -198,6 +220,7 @@ export default function SortFilterBar({
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

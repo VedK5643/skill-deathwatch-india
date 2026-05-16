@@ -1,12 +1,15 @@
 import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 import CustomTooltip from "./CustomTooltip";
 
@@ -44,6 +47,66 @@ export default function CompareChart({
     );
   }
 
+  // With only 1 week, use a bar chart — looks far better than floating dots
+  if (data.length === 1) {
+    const barData = [
+      { name: skillAName, jobs: data[0].skillA, color: "#2563EB" },
+      { name: skillBName, jobs: data[0].skillB, color: "#D97706" },
+    ];
+
+    const formatNumber = (v: number) => new Intl.NumberFormat("en-IN").format(v);
+
+    return (
+      <div
+        style={{
+          width: "100%",
+          backgroundColor: "#FFFFFE",
+          border: "1px solid #E8E4DC",
+          borderRadius: "4px",
+          padding: "16px",
+          boxSizing: "border-box",
+        }}
+      >
+        <div style={{ height: "320px" }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={barData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="4 2" stroke="#F0EDE6" vertical={false} />
+              <XAxis
+                dataKey="name"
+                stroke="#A8A29E"
+                tick={{ fill: "#A8A29E", fontSize: 13, fontFamily: "Inter, sans-serif" }}
+              />
+              <YAxis
+                stroke="#A8A29E"
+                tick={{ fill: "#A8A29E", fontSize: 12, fontFamily: "JetBrains Mono, monospace" }}
+                tickFormatter={formatNumber}
+              />
+              <Tooltip
+                formatter={(value: number) => [formatNumber(value), "Job listings"]}
+                contentStyle={{
+                  backgroundColor: "#FFFFFE",
+                  border: "1px solid #E8E4DC",
+                  borderRadius: "4px",
+                  fontSize: "13px",
+                  fontFamily: "Inter, sans-serif",
+                }}
+              />
+              <Bar dataKey="jobs" radius={[3, 3, 0, 0]}>
+                {barData.map((entry) => (
+                  <Cell key={entry.name} fill={entry.color} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+        <p style={{ fontSize: "12px", color: "#A8A29E", textAlign: "center", margin: "8px 0 0 0" }}>
+          Week 1 snapshot — trend lines appear automatically every Monday. 📈
+        </p>
+      </div>
+    );
+  }
+
+  // 2+ weeks: show the proper line chart
   return (
     <div
       style={{
@@ -58,44 +121,26 @@ export default function CompareChart({
       <div style={{ height: "400px" }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 5, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid
-              strokeDasharray="4 2"
-              stroke="#F0EDE6"
-              vertical={false}
-            />
+            <CartesianGrid strokeDasharray="4 2" stroke="#F0EDE6" vertical={false} />
             <XAxis
               dataKey="week"
               stroke="#A8A29E"
-              style={{
-                fontSize: "12px",
-                fontFamily: "JetBrains Mono, monospace",
-              }}
+              style={{ fontSize: "12px", fontFamily: "JetBrains Mono, monospace" }}
               tick={{ fill: "#A8A29E" }}
             />
             <YAxis
               stroke="#A8A29E"
-              style={{
-                fontSize: "12px",
-                fontFamily: "JetBrains Mono, monospace",
-              }}
+              style={{ fontSize: "12px", fontFamily: "JetBrains Mono, monospace" }}
               tick={{ fill: "#A8A29E" }}
             />
             <Tooltip
               content={({ active, payload, label }) => (
-                <CustomTooltip
-                  active={active}
-                  payload={payload}
-                  label={label}
-                />
+                <CustomTooltip active={active} payload={payload} label={label} />
               )}
               cursor={{ stroke: "#D97706", strokeWidth: 1 }}
             />
             <Legend
-              wrapperStyle={{
-                paddingTop: "16px",
-                fontFamily: "Inter, sans-serif",
-                fontSize: "13px",
-              }}
+              wrapperStyle={{ paddingTop: "16px", fontFamily: "Inter, sans-serif", fontSize: "13px" }}
               iconType="line"
             />
             <Line

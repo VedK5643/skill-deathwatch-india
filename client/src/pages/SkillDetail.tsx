@@ -1,112 +1,132 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { useParams, Link } from "wouter";
 import TrendChart from "@/components/TrendChart";
 import SkillCard from "@/components/SkillCard";
-import { SKILLS, getSkillBySlug, getSkillsByCategory } from "@/lib/skillsConfig";
-import { calcPercentChange, getSparklineData } from "@/lib/dataUtils";
-
-interface SkillDataWithTrend {
-  name: string;
-  category: string;
-  jobCount: number;
-  percentChange: number;
-  sparklineData: number[];
-  slug: string;
-}
+import { getSkillBySlug, getSkillsByCategory, SKILLS } from "@/lib/skillsConfig";
+import { calcPercentChange } from "@/lib/dataUtils";
+import { fetchSkillSnapshots, fetchSkillsSnapshots } from "@/lib/supabase";
+import type { SkillSnapshot } from "@/lib/supabase";
 
 export default function SkillDetail() {
   const params = useParams<{ name: string }>();
   const skillSlug = params.name;
-
   const skill = getSkillBySlug(skillSlug || "");
 
-  // Mock data for the skill
-  const mockData = useMemo(() => {
-    if (!skill) return null;
+  const [snapshots, setSnapshots] = useState<SkillSnapshot[]>([]);
+  const [relatedSnapshots, setRelatedSnapshots] = useState<SkillSnapshot[]>([]);
+  const [loading, setLoading] = useState(true);
 
-    const baseCount = Math.floor(Math.random() * 5000) + 1000;
-    const sparklineData = Array.from({ length: 52 }, () =>
-      Math.floor(baseCount + (Math.random() - 0.5) * 1000)
+  useEffect(() => {
+    if (!skill) return;
+
+    async function loadData() {
+      setLoading(true);
+
+      // Fetch history for this skill
+      const { data } = await fetchSkillSnapshots(skill!.name);
+      setSnapshots(data);
+
+      // Fetch latest snapshot for related skills in same category
+      const related = getSkillsByCategory(skill!.category)
+        .filter((s) => s.slug !== skill!.slug)
+        .slice(0, 5)
+        .map((s) => s.name);
+
+      const { data: relData } = await fetchSkillsSnapshots(related);
+      setRelatedSnapshots(relData);
+
+      setLoading(false);
+    }
+
+    loadData();
+  }, [skill]);
+
+  const skillData = useMemo(() => {
+    if (snapshots.length === 0) return null;
+
+    const sorted = [...snapshots].sort(
+      (a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime()
     );
 
-    // Generate chart data
-    const chartData = sparklineData.map((count, index) => ({
-      week: `W${index + 1}`,
-      count,
-      weekNumber: index + 1,
+    const chartData = sorted.map((s, i) => ({
+      week: `W${i + 1}`,
+      count: s.job_count,
+      weekNumber: s.week_number,
     }));
 
-    const currentCount = sparklineData[sparklineData.length - 1];
-    const previousCount = sparklineData[sparklineData.length - 2];
+    const currentCount = sorted[sorted.length - 1].job_count;
+    const previousCount = sorted.length > 1 ? sorted[sorted.length - 2].job_count : currentCount;
     const percentChange = calcPercentChange(currentCount, previousCount);
-
-    // Calculate stats
-    const maxCount = Math.max(...sparklineData);
-    const minCount = Math.min(...sparklineData);
+    const maxCount = Math.max(...sorted.map((s) => s.job_count));
+    const minCount = Math.min(...sorted.map((s) => s.job_count));
     const trend =
-      sparklineData[sparklineData.length - 1] > sparklineData[0]
+      sorted[sorted.length - 1].job_count > sorted[0].job_count
         ? "Growing"
-        : sparklineData[sparklineData.length - 1] < sparklineData[0]
+        : sorted[sorted.length - 1].job_count < sorted[0].job_count
           ? "Declining"
           : "Stable";
 
-    return {
-      currentCount,
-      percentChange,
-      maxCount,
-      minCount,
-      trend,
-      chartData,
-      sparklineData: sparklineData.slice(-8),
-    };
-  }, [skill]);
+    return { currentCount, percentChange, maxCount, minCount, trend, chartData };
+  }, [snapshots]);
 
-  // Mock related skills
-  const relatedSkills = useMemo(() => {
-    if (!skill) return [];
-    const categorySkills = getSkillsByCategory(skill.category);
-    return categorySkills
-      .filter((s) => s.slug !== skill.slug)
-      .slice(0, 5)
-      .map((s) => {
-        const baseCount = Math.floor(Math.random() * 5000) + 1000;
-        const sparklineData = Array.from({ length: 8 }, () =>
-          Math.floor(baseCount + (Math.random() - 0.5) * 1000)
-        );
-        const currentCount = sparklineData[sparklineData.length - 1];
-        const previousCount = sparklineData[sparklineData.length - 2];
-        const percentChange = calcPercentChange(currentCount, previousCount);
+  // Build related skill cards (latest snapshot per related skill)
+  const relatedSkillCards = useMemo(() => {
+    const latestBySkill: Record<string, SkillSnapshot> = {};
+    relatedSnapshots.forEach((s) => {
+      if (
+        !latestBySkill[s.skill_name] ||
+        new Date(s.recorded_at) > new Date(latestBySkill[s.skill_name].recorded_at)
+      ) {
+        latestBySkill[s.skill_name] = s;
+      }
+    });
 
-        return {
-          name: s.name,
-          category: s.category,
-          jobCount: currentCount,
-          percentChange,
-          sparklineData,
-          slug: s.slug,
-        };
-      });
-  }, [skill]);
+    return Object.values(latestBySkill).map((s) => ({
+      name: s.skill_name,
+      category: s.category,
+      jobCount: s.job_count,
+      percentChange: 0,
+      sparklineData: [s.job_count],
+      slug: s.skill_name.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+    }));
+  }, [relatedSnapshots]);
 
-  if (!skill || !mockData) {
+  const formatNumber = (num: number) => new Intl.NumberFormat("en-IN").format(num);
+
+  if (!skill) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          minHeight: "100vh",
-          backgroundColor: "#FAFAF8",
-        }}
-      >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", backgroundColor: "#FAFAF8" }}>
         <span style={{ color: "#A8A29E" }}>Skill not found</span>
       </div>
     );
   }
 
-  const formatNumber = (num: number) => {
-    return new Intl.NumberFormat("en-IN").format(num);
-  };
+  if (loading) {
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "60vh", backgroundColor: "#FAFAF8", flexDirection: "column", gap: "12px" }}>
+        <div style={{ width: "24px", height: "24px", border: "2px solid #E8E4DC", borderTopColor: "#78716C", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+        <span style={{ color: "#A8A29E", fontSize: "13px" }}>Loading live data…</span>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    );
+  }
+
+  if (!skillData) {
+    return (
+      <div style={{ backgroundColor: "#FAFAF8", color: "#1C1917", minHeight: "100vh" }}>
+        <div style={{ maxWidth: "860px", margin: "0 auto", padding: "40px 24px" }}>
+          <Link href="/"><a style={{ fontSize: "13px", color: "#78716C", textDecoration: "none" }}>Dashboard</a></Link>
+          <span style={{ color: "#A8A29E", margin: "0 8px" }}>/</span>
+          <span style={{ fontSize: "13px", color: "#78716C" }}>{skill.name}</span>
+          <div style={{ marginTop: "32px", borderLeft: "2px solid #D97706", paddingLeft: "16px", paddingTop: "12px", paddingBottom: "12px" }}>
+            <p style={{ fontSize: "15px", color: "#78716C", margin: 0 }}>
+              No data yet for <strong>{skill.name}</strong>. The first snapshot runs Monday at 6AM IST!
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ backgroundColor: "#FAFAF8", color: "#1C1917", minHeight: "100vh" }}>
@@ -114,15 +134,7 @@ export default function SkillDetail() {
         {/* Breadcrumb */}
         <div style={{ marginBottom: "32px" }}>
           <Link href="/">
-            <a
-              style={{
-                fontSize: "13px",
-                color: "#78716C",
-                textDecoration: "none",
-                transition: "color 200ms",
-              }}
-              className="hover:text-foreground"
-            >
+            <a style={{ fontSize: "13px", color: "#78716C", textDecoration: "none" }} className="hover:text-foreground">
               Dashboard
             </a>
           </Link>
@@ -133,199 +145,71 @@ export default function SkillDetail() {
         {/* Header */}
         <div style={{ marginBottom: "32px" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "8px" }}>
-            <h1 style={{ fontSize: "32px", fontWeight: 600, color: "#1C1917", margin: 0 }}>
-              {skill.name}
-            </h1>
-            <span
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "#A8A29E",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-              }}
-            >
+            <h1 style={{ fontSize: "32px", fontWeight: 600, color: "#1C1917", margin: 0 }}>{skill.name}</h1>
+            <span style={{ fontSize: "11px", fontWeight: 600, color: "#A8A29E", textTransform: "uppercase", letterSpacing: "0.1em" }}>
               {skill.category}
             </span>
           </div>
 
           <div style={{ display: "flex", alignItems: "baseline", gap: "8px", marginBottom: "16px" }}>
-            <div
-              style={{
-                fontSize: "48px",
-                fontWeight: 700,
-                fontFamily: "'JetBrains Mono', monospace",
-                color: "#1C1917",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {formatNumber(mockData.currentCount)}
+            <div style={{ fontSize: "48px", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", color: "#1C1917", fontVariantNumeric: "tabular-nums" }}>
+              {formatNumber(skillData.currentCount)}
             </div>
             <span style={{ fontSize: "14px", color: "#78716C" }}>job listings this week</span>
           </div>
 
-          {mockData.percentChange !== 0 && (
-            <div
-              style={{
-                fontSize: "14px",
-                fontWeight: 600,
-                color:
-                  mockData.percentChange > 0 ? "#16A34A" : "#DC2626",
-              }}
-            >
-              {mockData.percentChange > 0 ? "+" : ""}
-              {mockData.percentChange.toFixed(1)}% from last week
+          {skillData.percentChange !== 0 && (
+            <div style={{ fontSize: "14px", fontWeight: 600, color: skillData.percentChange > 0 ? "#16A34A" : "#DC2626" }}>
+              {skillData.percentChange > 0 ? "+" : ""}{skillData.percentChange.toFixed(1)}% from last week
             </div>
           )}
         </div>
 
         {/* Stats Strip */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0,
-            marginBottom: "32px",
-            borderTop: "1px solid #E8E4DC",
-            borderBottom: "1px solid #E8E4DC",
-            padding: "16px 0",
-          }}
-        >
+        <div style={{ display: "flex", alignItems: "center", gap: 0, marginBottom: "32px", borderTop: "1px solid #E8E4DC", borderBottom: "1px solid #E8E4DC", padding: "16px 0" }}>
           <div style={{ flex: 1, padding: "0 16px" }}>
-            <div
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "#A8A29E",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "8px",
-              }}
-            >
-              Peak Week
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                fontFamily: "'JetBrains Mono', monospace",
-                color: "#1C1917",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {formatNumber(mockData.maxCount)}
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "#A8A29E", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Peak Week</div>
+            <div style={{ fontSize: "20px", fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", color: "#1C1917", fontVariantNumeric: "tabular-nums" }}>
+              {formatNumber(skillData.maxCount)}
             </div>
           </div>
-          <div style={{ width: "1px", height: "48px", backgroundColor: "#E8E4DC" }}></div>
+          <div style={{ width: "1px", height: "48px", backgroundColor: "#E8E4DC" }} />
 
           <div style={{ flex: 1, padding: "0 16px" }}>
-            <div
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "#A8A29E",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "8px",
-              }}
-            >
-              Lowest Week
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                fontFamily: "'JetBrains Mono', monospace",
-                color: "#1C1917",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {formatNumber(mockData.minCount)}
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "#A8A29E", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Lowest Week</div>
+            <div style={{ fontSize: "20px", fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", color: "#1C1917", fontVariantNumeric: "tabular-nums" }}>
+              {formatNumber(skillData.minCount)}
             </div>
           </div>
-          <div style={{ width: "1px", height: "48px", backgroundColor: "#E8E4DC" }}></div>
+          <div style={{ width: "1px", height: "48px", backgroundColor: "#E8E4DC" }} />
 
           <div style={{ flex: 1, padding: "0 16px" }}>
-            <div
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "#A8A29E",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "8px",
-              }}
-            >
-              Current Count
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                fontFamily: "'JetBrains Mono', monospace",
-                color: "#1C1917",
-                fontVariantNumeric: "tabular-nums",
-              }}
-            >
-              {formatNumber(mockData.currentCount)}
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "#A8A29E", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Weeks Tracked</div>
+            <div style={{ fontSize: "20px", fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", color: "#1C1917", fontVariantNumeric: "tabular-nums" }}>
+              {snapshots.length}
             </div>
           </div>
-          <div style={{ width: "1px", height: "48px", backgroundColor: "#E8E4DC" }}></div>
+          <div style={{ width: "1px", height: "48px", backgroundColor: "#E8E4DC" }} />
 
           <div style={{ flex: 1, padding: "0 16px" }}>
-            <div
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "#A8A29E",
-                textTransform: "uppercase",
-                letterSpacing: "0.08em",
-                marginBottom: "8px",
-              }}
-            >
-              12-Week Trend
-            </div>
-            <div
-              style={{
-                fontSize: "20px",
-                fontWeight: 600,
-                color: "#D97706",
-              }}
-            >
-              {mockData.trend}
-            </div>
+            <div style={{ fontSize: "11px", fontWeight: 600, color: "#A8A29E", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "8px" }}>Trend</div>
+            <div style={{ fontSize: "20px", fontWeight: 600, color: "#D97706" }}>{skillData.trend}</div>
           </div>
         </div>
 
         {/* Chart */}
         <div style={{ marginBottom: "32px" }}>
-          <TrendChart data={mockData.chartData} skillName={skill.name} />
+          <TrendChart data={skillData.chartData} skillName={skill.name} />
         </div>
 
         {/* Related Skills */}
-        {relatedSkills.length > 0 && (
+        {relatedSkillCards.length > 0 && (
           <div style={{ marginBottom: "32px" }}>
-            <h2
-              style={{
-                fontSize: "11px",
-                fontWeight: 600,
-                color: "#A8A29E",
-                textTransform: "uppercase",
-                letterSpacing: "0.1em",
-                marginBottom: "16px",
-              }}
-            >
+            <h2 style={{ fontSize: "11px", fontWeight: 600, color: "#A8A29E", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "16px" }}>
               Also tracked in {skill.category}
             </h2>
-            <div
-              style={{
-                display: "flex",
-                gap: "16px",
-                overflowX: "auto",
-                paddingBottom: "16px",
-              }}
-            >
-              {relatedSkills.map((relatedSkill) => (
+            <div style={{ display: "flex", gap: "16px", overflowX: "auto", paddingBottom: "16px" }}>
+              {relatedSkillCards.map((relatedSkill) => (
                 <div key={relatedSkill.slug} style={{ flex: "0 0 144px" }}>
                   <SkillCard
                     name={relatedSkill.name}

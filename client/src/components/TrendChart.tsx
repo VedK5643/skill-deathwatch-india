@@ -38,6 +38,9 @@ export default function TrendChart({ data, skillName }: TrendChartProps) {
     );
   }
 
+  const minCount = Math.min(...data.map((d) => d.count));
+  const yAxisMin = Math.floor(minCount * 0.9);
+
   return (
     <div
       style={{
@@ -67,6 +70,7 @@ export default function TrendChart({ data, skillName }: TrendChartProps) {
             tick={{ fill: "#A8A29E" }}
           />
           <YAxis
+            domain={[yAxisMin, "auto"]}
             stroke="#A8A29E"
             style={{
               fontSize: "12px",

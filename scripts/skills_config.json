@@ -41,9 +41,25 @@
   { "name": "JUnit",        "category": "Testing",              "slug": "junit"        },
   { "name": "Postman",      "category": "Testing",              "slug": "postman"      },
 
-  { "name": "TensorFlow",   "category": "AI/ML",                "slug": "tensorflow"   },
-  { "name": "PyTorch",      "category": "AI/ML",                "slug": "pytorch"      },
-  { "name": "Scikit-learn", "category": "AI/ML",                "slug": "scikit-learn" },
-  { "name": "LangChain",    "category": "AI/ML",                "slug": "langchain"    },
-  { "name": "Hugging Face", "category": "AI/ML",                "slug": "hugging-face" }
+  { "name": "TensorFlow",      "category": "AI/ML",                "slug": "tensorflow"      },
+  { "name": "PyTorch",         "category": "AI/ML",                "slug": "pytorch"         },
+  { "name": "Scikit-learn",    "category": "AI/ML",                "slug": "scikit-learn"    },
+  { "name": "LangChain",       "category": "AI/ML",                "slug": "langchain"       },
+  { "name": "Hugging Face",    "category": "AI/ML",                "slug": "hugging-face"    },
+  { "name": "OpenAI",          "category": "AI/ML",                "slug": "openai"          },
+
+  { "name": "Prometheus",      "category": "DevOps & Cloud",       "slug": "prometheus"      },
+  { "name": "Grafana",         "category": "DevOps & Cloud",       "slug": "grafana"         },
+  { "name": "GitHub Actions",  "category": "DevOps & Cloud",       "slug": "github-actions"  },
+  { "name": "Linux",           "category": "DevOps & Cloud",       "slug": "linux"           },
+
+  { "name": "Snowflake",       "category": "Data & Analytics",     "slug": "snowflake"       },
+  { "name": "BigQuery",        "category": "Data & Analytics",     "slug": "bigquery"        },
+  { "name": "Apache Kafka",    "category": "Data & Analytics",     "slug": "apache-kafka"    },
+  { "name": "GraphQL",         "category": "Data & Analytics",     "slug": "graphql"         },
+
+  { "name": "DevSecOps",       "category": "Cybersecurity",        "slug": "devsecops"       },
+  { "name": "Cybersecurity",   "category": "Cybersecurity",        "slug": "cybersecurity"   },
+
+  { "name": "Solidity",        "category": "Blockchain",           "slug": "solidity"        }
 ]

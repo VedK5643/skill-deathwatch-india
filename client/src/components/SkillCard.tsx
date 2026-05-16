@@ -8,6 +8,7 @@ interface SkillCardProps {
   percentChange: number;
   sparklineData: number[];
   slug: string;
+  isTrending?: boolean;
 }
 
 // Category badge color mapping
@@ -28,6 +29,7 @@ export default function SkillCard({
   percentChange,
   sparklineData,
   slug,
+  isTrending,
 }: SkillCardProps) {
   const trend = percentChange > 0 ? "up" : percentChange < 0 ? "down" : "flat";
   const trendColor =
@@ -101,7 +103,7 @@ export default function SkillCard({
         </div>
 
         {/* Row 2: Skill Name */}
-        <div className="mb-2">
+        <div className="mb-2" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
           <span
             style={{
               fontSize: "13px",
@@ -112,6 +114,9 @@ export default function SkillCard({
           >
             {name}
           </span>
+          {isTrending && (
+            <span style={{ fontSize: "12px", lineHeight: 1 }}>🔥</span>
+          )}
         </div>
 
         {/* Row 3: Job Count */}
